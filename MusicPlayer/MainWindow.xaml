@@ -7,8 +7,13 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
         Icon="/img/logo.png"
-        Title="Music player" Height="620" Width="1020" Background="#FF191919">
+        Title="Music player" 
+        Height="620" 
+        Width="1020" 
+        Background="#FF191919">
 
     <Window.CommandBindings>
         <CommandBinding
@@ -66,6 +71,30 @@
             </MenuItem>
         </Menu>
 
+        <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Button
+                x:Name="MinimazieBtn"
+                Click="MinimazieBtn_Click"
+                Content="{materialDesign:PackIcon WindowMinimize}"
+                Foreground="White"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                ToolTip="Minimize window" />
+            <!--<Button
+                Content="{materialDesign:PackIcon WindowRestore}"
+                Foreground="White"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                ToolTip="Restore window" />-->
+            <Button
+                x:Name="CloseBtn"
+                Click="CloseBtn_Click"
+                Content="{materialDesign:PackIcon Close}"
+                Foreground="White"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                ToolTip="Close window" />
+        </WrapPanel>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,40,40,0">
 
@@ -74,7 +103,7 @@
 
                 <StackPanel>
                     <Label Content="Плейлист" FontSize="20" FontWeight="Bold" />
-                    <ListView x:Name="FilesLV" Width="590" FontSize="20">
+                    <ListView x:Name="FilesLV" Width="550" FontSize="20">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
@@ -124,27 +153,16 @@
                         </Button>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Button IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" RenderTransformOrigin="0.5,0.5">
-                            <Button.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform/>
-
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </Button.RenderTransform>
+                        <Button x:Name="PrevBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" RenderTransformOrigin="0.5,0.5" Click="PrevBtn_Click">
                             <materialDesign:PackIcon  Kind="SkipNextCircleOutline" Width="30" Height="30" RenderTransformOrigin="0.5,0.5" >
                                 <materialDesign:PackIcon.RenderTransform>
                                     <TransformGroup>
-                                        <ScaleTransform/>
-                                        <SkewTransform/>
                                         <RotateTransform Angle="180"/>
-                                        <TranslateTransform/>
                                     </TransformGroup>
                                 </materialDesign:PackIcon.RenderTransform>
                             </materialDesign:PackIcon>
                         </Button>
-                        <Button IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0">
+                        <Button x:Name="NextBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" Click="NextBtn_Click">
                             <materialDesign:PackIcon  Kind="SkipNextCircleOutline" Width="30" Height="30" />
                         </Button>
                     </StackPanel>

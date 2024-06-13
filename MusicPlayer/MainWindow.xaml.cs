@@ -27,7 +27,10 @@ namespace MusicPlayer
         private List<FileInfo> fileInfoFolder = new List<FileInfo>();
         public static RoutedCommand CloseCommand = new RoutedCommand();
         public List<string> Playlist = new List<string>();
-        
+
+        private FileInfo _currentTrack = null;
+        private int _currentTrackIndex = -1;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -54,6 +57,7 @@ namespace MusicPlayer
             MusicSlider.Value = 0;
             CurrentTimeLabel.Content = "0:00";
             _timer.Stop();
+            PlayNextTrack();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -85,6 +89,54 @@ namespace MusicPlayer
                 VolumeSlider.Value = 0;
             }
         }
+
+
+        private void PlayNextTrack()
+        {
+            string nextTrackPath = GetNextTrackPath();
+
+            if (!string.IsNullOrEmpty(nextTrackPath))
+            {
+                _currentTrack = fileInfoFolder[_currentTrackIndex];
+                _player.Open(new Uri(nextTrackPath));
+                _player.Play();
+                FilesLV.SelectedIndex = _currentTrackIndex;
+                ReadMP3File(nextTrackPath);
+            }
+        }
+
+        private string GetNextTrackPath()
+        {
+            if (fileInfoFolder.Count == 0) return null;
+
+            _currentTrackIndex = (_currentTrackIndex + 1) % fileInfoFolder.Count;
+            _currentTrack = fileInfoFolder[_currentTrackIndex];
+            return _currentTrack.FullName;
+        }
+
+        private void PlayPrevTrack()
+        {
+            string prevTrackPath = GetPrevTrackPath();
+
+            if (!string.IsNullOrEmpty(prevTrackPath))
+            {
+                _currentTrack = fileInfoFolder[_currentTrackIndex];
+                _player.Open(new Uri(prevTrackPath));
+                _player.Play();
+                FilesLV.SelectedIndex = _currentTrackIndex;
+                ReadMP3File(prevTrackPath);
+            }
+        }
+
+        private string GetPrevTrackPath()
+        {
+            if (fileInfoFolder.Count == 0) return null;
+
+            _currentTrackIndex = (_currentTrackIndex - 1 + fileInfoFolder.Count) % fileInfoFolder.Count;
+            _currentTrack = fileInfoFolder[_currentTrackIndex];
+            return _currentTrack.FullName;
+        }
+
 
         private void OpenFileMI_Click(object sender, RoutedEventArgs e)
         {
@@ -198,12 +250,31 @@ namespace MusicPlayer
             {
                 if (f.Name == selectedItem.ToString())
                 {
+                    _currentTrack = f;
                     _player.Open(new Uri(f.FullName));
                     ReadMP3File(f.FullName);
                 }
             }
         }
 
-        
+        private void NextBtn_Click(object sender, RoutedEventArgs e)
+        {
+            PlayNextTrack();
+        }
+
+        private void PrevBtn_Click(object sender, RoutedEventArgs e)
+        {
+            PlayPrevTrack();
+        }
+
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MinimazieBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
     }
 }
