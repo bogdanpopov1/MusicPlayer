@@ -15,21 +15,75 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MusicPlayer
 {
     public partial class MainWindow : Window
     {
         private MediaPlayer _player = new MediaPlayer();
+        private DispatcherTimer _timer;
+
         private List<FileInfo> fileInfoFolder = new List<FileInfo>();
         public static RoutedCommand CloseCommand = new RoutedCommand();
         public List<string> Playlist = new List<string>();
+        
         public MainWindow()
         {
             InitializeComponent();
 
             _player = new MediaPlayer();
+            _player.MediaOpened += Player_MediaOpened;
+            _player.MediaEnded += Player_MediaEnded;
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += Timer_Tick;
+
             this.DataContext = this;            
+        }
+
+        private void Player_MediaOpened(object sender, EventArgs e)
+        {
+            MusicSlider.Maximum = _player.NaturalDuration.TimeSpan.TotalSeconds;
+            TotalTimeLabel.Content = _player.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
+            _timer.Start();
+        }
+
+        private void Player_MediaEnded(object sender, EventArgs e)
+        {
+            MusicSlider.Value = 0;
+            CurrentTimeLabel.Content = "0:00";
+            _timer.Stop();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            MusicSlider.Value = _player.Position.TotalSeconds;
+            CurrentTimeLabel.Content = _player.Position.ToString(@"mm\:ss");
+        }
+
+        private void MusicSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _player.Position = TimeSpan.FromSeconds(e.NewValue);
+        }
+
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double volume = e.NewValue / 100.0;
+            _player.Volume = volume;
+        }
+
+        private void VolumeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_player.Volume == 0)
+            {
+                _player.Volume = 100;
+                VolumeSlider.Value = 100;
+            } else
+            {
+                _player.Volume = 0;
+                VolumeSlider.Value = 0;
+            }
         }
 
         private void OpenFileMI_Click(object sender, RoutedEventArgs e)
@@ -149,5 +203,7 @@ namespace MusicPlayer
                 }
             }
         }
+
+        
     }
 }
