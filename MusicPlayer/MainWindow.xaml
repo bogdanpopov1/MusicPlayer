@@ -6,7 +6,21 @@
         xmlns:local="clr-namespace:MusicPlayer" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="620" Width="1020" Background="#FF191919">
+        Title="Music player" Height="620" Width="1020" Background="#FF191919">
+
+    <Window.CommandBindings>
+        <CommandBinding
+        CanExecute="CloseCommand_CanExecute"
+        Command="{x:Static local:MainWindow.CloseCommand}"
+        Executed="CloseCommand_Executed" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding
+        Key="E"
+        Command="{x:Static local:MainWindow.CloseCommand}"
+        Modifiers="Ctrl" />
+    </Window.InputBindings>
+
     <Grid  Margin="10,0,10,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="48*" />
@@ -16,33 +30,74 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File" Padding="16,0,16,0" Margin="-10,0,0,0" >
-                <MenuItem x:Name="OpenFileMI" Click="OpenFileMI_Click" Header="Open file"/>
-                <MenuItem x:Name="OpenFolderMI" Click="OpenFolderMI_Click" Header="Open folder"/>
+                <MenuItem x:Name="OpenFileMI" Click="OpenFileMI_Click" Header="Open file" Icon="{materialDesign:PackIcon Kind=File}" />
+                <MenuItem x:Name="OpenFolderMI" Click="OpenFolderMI_Click" Header="Open folder" Icon="{materialDesign:PackIcon Kind=Folder}" />
+                <Separator />
+                <MenuItem Header="Copy song" Icon="{materialDesign:PackIcon Kind=ContentCopy}" />
+                <MenuItem Header="Save playlist" Icon="{materialDesign:PackIcon Kind=ContentSave}" />
+                <Separator />
+                <MenuItem
+                    Command="{x:Static local:MainWindow.CloseCommand}"
+                    Header="Exit"
+                    Icon="{materialDesign:PackIcon Kind=ExitToApp}"
+                    InputGestureText="Ctrl+E" />
             </MenuItem>
-
-            <MenuItem Header="View" >
-                <MenuItem Header="Hide window"/>
+            <MenuItem Header="_Edit">
+                <MenuItem
+                    Command="Cut"
+                    Header="_Cut"
+                    Icon="{materialDesign:PackIcon Kind=ContentCut}" />
+                <MenuItem
+                    Command="Copy"
+                    Header="_Copy"
+                    Icon="{materialDesign:PackIcon Kind=ContentCopy}" />
+                <MenuItem
+                    Command="Paste"
+                    Header="_Paste"
+                    Icon="{materialDesign:PackIcon Kind=ContentPaste}" />
             </MenuItem>
-
-            <MenuItem Header="Settings" />
+            <MenuItem Header="_View">
+                <MenuItem
+                    Click="MenuItem_Click"
+                    Header="View task points"
+                    Icon="{materialDesign:PackIcon Kind=Help}" />
+            </MenuItem>
         </Menu>
 
-        
-        <StackPanel Height="224" Margin="0,48,0,0" Grid.RowSpan="2" Width="32" Orientation="Horizontal">
-            
 
-                <Image
-                Margin="12"/>
-                <!--Source="/logo.jpg"--> 
-                    
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,40,40,0">
 
-            <Grid Margin="12">
-                <DataGrid
-                    x:Name="FilesDG"
-                    AutoGenerateColumns="True"
-                    ItemsSource="{Binding fileInfoFolder}" />
-            </Grid>
+            <StackPanel Margin="0,0,0,20" Orientation="Horizontal">
+                <Image x:Name="MusicImage" Source="img/logo.jpg" Margin="0,0,30,0" Width="300" Height="300" />
 
+                <ListView x:Name="FilesLV" Width="590" FontSize="20">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="550">
+                                <GridViewColumn.Header>
+                                    <TextBlock Text="Плейлист" HorizontalAlignment="Left" Margin="-20,-24,0,0" FontWeight="Bold" VerticalAlignment="Top"/>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Label x:Name="TitleLabel" Content="Music title" Padding="0" FontSize="20" FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="ArtistTB" Text="Author" Foreground="White" FontSize="16" />
+                    <TextBlock Text="•" Foreground="White" FontSize="16" Margin="6,0,6,0" />
+                    <TextBlock x:Name="AlbumTB" Text="Album" Foreground="White" FontSize="16" />
+                </StackPanel>
+
+            </StackPanel>
 
         </StackPanel>
 
@@ -61,10 +116,10 @@
                         <Button x:Name="PlayBtn"  IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" Click="PlayBtn_Click">
                             <materialDesign:PackIcon  Kind="PlayCircleOutline" Width="30" Height="30" />
                         </Button>
-                        <Button x:Name="StopBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" Click="StopBtn_Click">
+                        <Button x:Name="PauseBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Margin="0,0,6,0" Click="PauseBtn_Click">
                             <materialDesign:PackIcon  Kind="PauseCircleOutline" Width="30" Height="30" />
                         </Button>
-                        <Button x:Name="PauseBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Click="PauseBtn_Click">
+                        <Button x:Name="StopBtn" IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"  Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="MaterialDesignFloatingActionMiniLightButton" Click="StopBtn_Click">
                             <materialDesign:PackIcon  Kind="StopCircleOutline" Width="30" Height="30" />
                         </Button>
                     </StackPanel>
