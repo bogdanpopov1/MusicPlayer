@@ -20,11 +20,21 @@
         CanExecute="CloseCommand_CanExecute"
         Command="{x:Static local:MainWindow.CloseCommand}"
         Executed="CloseCommand_Executed" />
+
+        <CommandBinding
+        CanExecute="SaveCommand_CanExecute"
+        Command="{x:Static local:MainWindow.SaveCommand}"
+        Executed="SaveCommand_Executed" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding
         Key="E"
         Command="{x:Static local:MainWindow.CloseCommand}"
+        Modifiers="Ctrl" />
+
+        <KeyBinding
+        Key="S"
+        Command="{x:Static local:MainWindow.SaveCommand}"
         Modifiers="Ctrl" />
     </Window.InputBindings>
 
@@ -41,7 +51,11 @@
                 <MenuItem x:Name="OpenFolderMI" Click="OpenFolderMI_Click" Header="Open folder" Icon="{materialDesign:PackIcon Kind=Folder}" />
                 <Separator />
                 <MenuItem Header="Copy song" Icon="{materialDesign:PackIcon Kind=ContentCopy}" />
-                <MenuItem Header="Save playlist" Icon="{materialDesign:PackIcon Kind=ContentSave}" />
+                <MenuItem 
+                    Command="{x:Static local:MainWindow.SaveCommand}"
+                    Header="Save playlist" 
+                    Icon="{materialDesign:PackIcon Kind=ContentSave}" 
+                    InputGestureText="Ctrl+S" />
                 <Separator />
                 <MenuItem
                     Command="{x:Static local:MainWindow.CloseCommand}"

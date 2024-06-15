@@ -25,7 +25,10 @@ namespace MusicPlayer
         private DispatcherTimer _timer;
 
         private List<FileInfo> fileInfoFolder = new List<FileInfo>();
+
         public static RoutedCommand CloseCommand = new RoutedCommand();
+        public static RoutedCommand SaveCommand = new RoutedCommand();
+
         public List<string> Playlist = new List<string>();
 
         private FileInfo _currentTrack = null;
@@ -273,6 +276,16 @@ namespace MusicPlayer
         }
 
         private void CloseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
         }
