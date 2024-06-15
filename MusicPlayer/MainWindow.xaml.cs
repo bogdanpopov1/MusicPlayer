@@ -90,7 +90,6 @@ namespace MusicPlayer
             }
         }
 
-
         private void PlayNextTrack()
         {
             string nextTrackPath = GetNextTrackPath();
@@ -109,7 +108,25 @@ namespace MusicPlayer
         {
             if (fileInfoFolder.Count == 0) return null;
 
-            _currentTrackIndex = (_currentTrackIndex + 1) % fileInfoFolder.Count;
+            if (FilesLV.SelectedItem != null)
+            {
+                var selectedItem = FilesLV.SelectedItem;
+
+                foreach (var f in fileInfoFolder)
+                {
+                    if (f.Name == selectedItem.ToString())
+                    {
+                        _currentTrackIndex = fileInfoFolder.IndexOf(f) + 1;
+                    }
+                }
+
+                FilesLV.SelectedItem = null;
+            }
+            else
+            {
+                _currentTrackIndex = (_currentTrackIndex + 1) % fileInfoFolder.Count;
+            }
+            
             _currentTrack = fileInfoFolder[_currentTrackIndex];
             return _currentTrack.FullName;
         }
@@ -132,7 +149,24 @@ namespace MusicPlayer
         {
             if (fileInfoFolder.Count == 0) return null;
 
-            _currentTrackIndex = (_currentTrackIndex - 1 + fileInfoFolder.Count) % fileInfoFolder.Count;
+            if (FilesLV.SelectedItem != null)
+            {
+                var selectedItem = FilesLV.SelectedItem;
+
+                foreach (var f in fileInfoFolder)
+                {
+                    if (f.Name == selectedItem.ToString())
+                    {
+                        _currentTrackIndex = fileInfoFolder.IndexOf(f) - 1;
+                    }
+                }
+
+                FilesLV.SelectedItem = null;
+            } else
+            {
+                _currentTrackIndex = (_currentTrackIndex - 1 + fileInfoFolder.Count) % fileInfoFolder.Count;
+            }
+
             _currentTrack = fileInfoFolder[_currentTrackIndex];
             return _currentTrack.FullName;
         }
@@ -153,9 +187,14 @@ namespace MusicPlayer
         {
             FolderBrowserDialog fileDialog = new FolderBrowserDialog();
 
-            var fileDialogOk = fileDialog.ShowDialog();
+            fileDialog.ShowDialog();
 
             var filename = fileDialog.SelectedPath;
+
+            if (filename == "") return;
+
+            fileInfoFolder.Clear();
+            Playlist.Clear();
 
             DirectoryInfo dirInfo = new DirectoryInfo(filename);
 
@@ -164,6 +203,8 @@ namespace MusicPlayer
             {
                 fileInfoFolder.Add(f);
             }
+
+            FilesLV.Items.Clear();
 
             foreach (var f in fileInfoFolder)
             {

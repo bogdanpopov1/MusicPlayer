@@ -103,7 +103,7 @@
 
                 <StackPanel>
                     <Label Content="Плейлист" FontSize="20" FontWeight="Bold" />
-                    <ListView x:Name="FilesLV" Width="550" FontSize="20">
+                    <ListView x:Name="FilesLV" Width="551" FontSize="20" ScrollViewer.CanContentScroll="True" Height="260">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
