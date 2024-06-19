@@ -23,11 +23,13 @@ namespace MusicPlayer
     {
         private MediaPlayer _player = new MediaPlayer();
         private DispatcherTimer _timer;
+        private bool triggerOpen = true;
 
         private List<FileInfo> fileInfoFolder = new List<FileInfo>();
 
         public static RoutedCommand CloseCommand = new RoutedCommand();
-        public static RoutedCommand SaveCommand = new RoutedCommand();
+        public static RoutedCommand OpenFileCommand = new RoutedCommand();
+        public static RoutedCommand OpenFolderCommand = new RoutedCommand();
 
         public List<string> Playlist = new List<string>();
 
@@ -45,7 +47,7 @@ namespace MusicPlayer
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
 
-            this.DataContext = this;            
+            this.DataContext = this;
         }
 
         private void Player_MediaOpened(object sender, EventArgs e)
@@ -86,7 +88,8 @@ namespace MusicPlayer
             {
                 _player.Volume = 100;
                 VolumeSlider.Value = 100;
-            } else
+            }
+            else
             {
                 _player.Volume = 0;
                 VolumeSlider.Value = 0;
@@ -99,7 +102,10 @@ namespace MusicPlayer
 
             if (!string.IsNullOrEmpty(nextTrackPath))
             {
-                _currentTrack = fileInfoFolder[_currentTrackIndex];
+                if (_currentTrackIndex == fileInfoFolder.Count)
+                    _currentTrack = fileInfoFolder[0];
+                else
+                    _currentTrack = fileInfoFolder[_currentTrackIndex];
                 _player.Open(new Uri(nextTrackPath));
                 _player.Play();
                 FilesLV.SelectedIndex = _currentTrackIndex;
@@ -129,8 +135,11 @@ namespace MusicPlayer
             {
                 _currentTrackIndex = (_currentTrackIndex + 1) % fileInfoFolder.Count;
             }
-            
-            _currentTrack = fileInfoFolder[_currentTrackIndex];
+
+            if (_currentTrackIndex == fileInfoFolder.Count)
+                _currentTrack = fileInfoFolder[0];
+            else
+                _currentTrack = fileInfoFolder[_currentTrackIndex];
             return _currentTrack.FullName;
         }
 
@@ -140,7 +149,10 @@ namespace MusicPlayer
 
             if (!string.IsNullOrEmpty(prevTrackPath))
             {
-                _currentTrack = fileInfoFolder[_currentTrackIndex];
+                if (_currentTrackIndex == -1)
+                    _currentTrack = fileInfoFolder.Last();
+                else
+                    _currentTrack = fileInfoFolder[_currentTrackIndex];
                 _player.Open(new Uri(prevTrackPath));
                 _player.Play();
                 FilesLV.SelectedIndex = _currentTrackIndex;
@@ -165,18 +177,23 @@ namespace MusicPlayer
                 }
 
                 FilesLV.SelectedItem = null;
-            } else
+            }
+            else
             {
                 _currentTrackIndex = (_currentTrackIndex - 1 + fileInfoFolder.Count) % fileInfoFolder.Count;
             }
 
-            _currentTrack = fileInfoFolder[_currentTrackIndex];
+            if (_currentTrackIndex == -1)
+                _currentTrack = fileInfoFolder.Last();
+            else
+                _currentTrack = fileInfoFolder[_currentTrackIndex];
             return _currentTrack.FullName;
         }
 
 
         private void OpenFileMI_Click(object sender, RoutedEventArgs e)
         {
+            triggerOpen = true;
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "MP3 files (*.mp3)|*.mp3";
             if (openFileDialog.ShowDialog() == true)
@@ -184,17 +201,25 @@ namespace MusicPlayer
                 ReadMP3File(openFileDialog.FileName);
                 _player.Open(new Uri(openFileDialog.FileName));
             }
+            else
+                triggerOpen = false;
         }
 
         private void OpenFolderMI_Click(object sender, RoutedEventArgs e)
         {
+            triggerOpen = true;
+
             FolderBrowserDialog fileDialog = new FolderBrowserDialog();
 
             fileDialog.ShowDialog();
 
             var filename = fileDialog.SelectedPath;
 
-            if (filename == "") return;
+            if (filename == "")
+            {
+                triggerOpen = false;
+                return;
+            }
 
             fileInfoFolder.Clear();
             Playlist.Clear();
@@ -280,15 +305,28 @@ namespace MusicPlayer
             e.CanExecute = true;
         }
 
-        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+
+
+        private void OpenFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Close();
+            OpenFileMI_Click(sender, e);
         }
 
-        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void OpenFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
         }
+
+        private void OpenFolderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            OpenFolderMI_Click(sender, e);
+        }
+
+        private void OpenFolderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
